@@ -1,28 +1,43 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
+  computed: {
+    ...mapGetters('auth', ['user'])
+  },
+
+  mounted() {
+    if (localStorage.getItem('authToken')) {
+      this.getUserData().then(() => this.$router.push('/home'));
+    }
+
+    this.$router.push('/login');
+  },
+
+  methods: {
+    ...mapActions("auth", ["sendLogoutRequest", "getUserData"]),
+
+    logout() {
+      this.sendLogoutRequest();
+      this.$router.push('/');
+    }
   }
-}
+};
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+body > div > .container {
+  padding: 200px 15px 0;
+}
+
+#loginButton {
+  margin: 20px 0;
+  width: 200px;
 }
 </style>
