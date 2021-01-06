@@ -34,11 +34,11 @@ import {mapActions, mapGetters} from 'vuex';
     },
 
     methods: {
-      ...mapActions("auth", ["sendLogoutRequest"]),
+      ...mapActions("auth", ["getUser", "sendLogoutRequest"]),
 
       logout() {
         this.sendLogoutRequest();
-        this.$router.push('/');
+        this.$router.push('/login');
       }
     }
   }

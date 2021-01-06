@@ -14,30 +14,22 @@ export default {
 
   mounted() {
     if (localStorage.getItem('authToken')) {
-      this.getUserData().then(() => this.$router.push('/home'));
+      this.getUser().then(() => {
+        console.log(this.user);
+        // if (this.$store.state.user.isAdmin) {
+        //   this.$router.push({ name: 'Admin' });
+        //   return;
+        // }
+        //
+        // this.$router.push({ name: 'Home' });
+      });
     }
 
     this.$router.push('/login');
   },
 
   methods: {
-    ...mapActions("auth", ["sendLogoutRequest", "getUserData"]),
-
-    logout() {
-      this.sendLogoutRequest();
-      this.$router.push('/');
-    }
+    ...mapActions("auth", ["getUser"])
   }
 };
 </script>
-
-<style>
-body > div > .container {
-  padding: 200px 15px 0;
-}
-
-#loginButton {
-  margin: 20px 0;
-  width: 200px;
-}
-</style>

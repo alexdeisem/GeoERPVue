@@ -4,25 +4,25 @@ export default {
     namespaced: true,
 
     state: {
-        userData: null
+        user: null
     },
 
     getters: {
-        user: state => state.userData
+        user: state => state.user,
     },
 
     mutations: {
-        setUserData(state, user) {
-            state.userData = user;
+        setUser(state, user) {
+            state.user = user;
         }
     },
 
     actions: {
-        getUserData({ commit }) {
+        getUser({ commit }) {
             axios
                 .get(process.env.VUE_APP_API_URL + 'user')
                 .then(response => {
-                    commit('setUserData', response.data);
+                    commit('setUser', response.data);
                 })
                 .catch(() => {
                     localStorage.removeItem('authToken');
@@ -30,19 +30,19 @@ export default {
         },
         sendLoginRequest({ commit }, data) {
             commit('setErrors', {}, { root: true });
-            console.log(process.env.VUE_APP_API_URL + 'login');
             return axios
                 .post(process.env.VUE_APP_API_URL + 'login', data)
                 .then(response => {
-                    commit('setUserData', response.data.user);
+                    commit('setUser', response.data.user);
                     localStorage.setItem('authToken', response.data.token);
+                    return response.data.user.isAdmin;
                 });
         },
         sendLogoutRequest({ commit }) {
             axios
                 .post(process.env.VUE_APP_API_URL + 'logout')
                 .then(() => {
-                    commit('setUserData', null);
+                    commit('setUser', null);
                     localStorage.removeItem('authToken');
                 });
         }
