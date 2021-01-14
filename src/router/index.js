@@ -1,10 +1,12 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 
+import store from '../store';
+
 import Login from "../components/Login";
 import Home from "../components/Home";
+import Secure from "../components/Secure";
 import Admin from "../components/admin/Admin";
-import Dashboard from "../components/admin/Dashboard";
 
 
 Vue.use(VueRouter);
@@ -21,15 +23,17 @@ const routes = [
         component: Login
     },
     {
+        path: '/secure',
+        name: 'Secure',
+        component: Secure,
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
         path: '/admin',
-        component: Admin,
-        children: [
-            {
-                path: 'dashboard',
-                name: 'Dashboard',
-                component: Dashboard
-            }
-        ]
+        name: 'Admin',
+        component: Admin
     }
 ];
 
@@ -37,6 +41,16 @@ const router = new VueRouter({
     mode: 'history',
     base: process.env.BASE_URL,
     routes
+});
+
+router.beforeEach((to, from, next) => {
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+        if (store.getters.isLoggedIn) {
+            next();
+        }
+    } else {
+        next();
+    }
 });
 
 export default router;

@@ -1,126 +1,98 @@
 <template>
-  <div>
-    <div id="loginContainer">
-      <b-jumbotron
-          id="loginJumborton"
-          header="GeoERP"
-          bg-variant="white"
+  <div id="loginFormContainer">
+    <v-form
+        id="loginForm"
+        ref="form"
+        v-model="valid"
+        lazy-validation
+        @submit.prevent="submit"
+    >
+      <div class="text-h2 pb-4">GeoERP</div>
+      <v-row>
+        <v-col cols="12" sm="6" md="6">
+          <v-text-field
+              v-model="username"
+              :rules="usernameRules"
+              label="Имя пользователя"
+              autocomplete="off"
+              requried
+          ></v-text-field>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12" sm="6" md="6">
+          <v-text-field
+              v-model="password"
+              :rules="passwordRules"
+              type="password"
+              label="Пароль"
+              requried
+          ></v-text-field>
+        </v-col>
+      </v-row>
+      <v-btn
+          class="mt-4"
+          id="loginBtn"
+          :disabled="!valid"
+          depressed
+          color="primary"
+          type="submit"
+          @click="submit"
       >
-        <div class="login">
-          <div class="card">
-            <div class="card-body">
-              <form v-on:keyup.enter="login">
-                <div class="form-group">
-                  <label for="username">Логин:</label>
-                  <input
-                      type="text"
-                      class="form-control"
-                      :class="{ 'is-invalid': errors.username }"
-                      id="username"
-                      autocomplete="off"
-                      v-model="details.username"
-                  >
-                  <div class="invalid-feedback" v-if="errors.username">
-                    {{ errors.username[0] }}
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="password">Пароль:</label>
-                  <input
-                      type="password"
-                      class="form-control"
-                      :class="{ 'is-invalid': errors.password }"
-                      id="password"
-                      v-model="details.password"
-                  />
-                  <div class="invalid-feedback" v-if="errors.password">
-                    {{ errors.password[0] }}
-                  </div>
-                </div>
-                <b-button
-                    id="loginButton"
-                    @click="login"
-                    variant="primary"
-                >Войти
-                </b-button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </b-jumbotron>
-    </div>
+        Войти
+      </v-btn>
+    </v-form>
   </div>
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
 
 export default {
   name: 'Login',
 
-  data() {
-    return {
-      details: {
-        username: null,
-        password: null
-      }
-    };
-  },
-
-  computed: {
-    ...mapGetters(['errors'])
-  },
-
-  mounted() {
-    this.$store.commit('setErrors', {});
-  },
+  data: () => ({
+    valid: true,
+    username: '',
+    password: '',
+    usernameRules: [
+        v => !!v || 'Укажите имя пользователя',
+        v => (v && v.length >= 2) || 'Имя пользователя должно быть длиннее 1 символа'
+    ],
+    passwordRules: [
+        v => !!v || 'Введите пароль',
+        v => (v && v.length >= 8) || 'Пароль должен быть не меньше 8 символов'
+    ]
+  }),
 
   methods: {
-    ...mapActions('auth', ['sendLoginRequest']),
+    submit() {
+      if (!this.$refs.form.validate()) {
+        return;
+      }
 
-    login() {
-      this.sendLoginRequest(this.details).then((isAdmin) => {
-        if (isAdmin) {
-          this.$router.push({ name: 'Dashboard' });
-          return;
-        }
-
-        this.$router.push({ name: 'Home' });
-      });
-    }
+      let username = this.username
+      let password = this.password
+      this.$store.dispatch('auth/login', { username, password })
+          .then(() => {
+            this.$router.push('/');
+          })
+          .catch(err => console.log(err))
+    },
   }
 };
 </script>
 
 <style>
-#loginContainer {
-  width: 100%;
-  height: 100vh;
-  padding: 10% 20%;
-  background: repeating-linear-gradient(
-    45deg,
-    transparent,
-    transparent 20px,
-    #f6f6f6 20px,
-    #f6f6f6 40px
-  )
-}
+  #loginFormContainer {
+    padding: 10% 30%;
+    background: #F2F2F2;
+    height: 100vh;
+  }
 
-#loginJumborton {
-  box-shadow: 5px 5px 10px 5px #d0d0d0;
-  border-radius: 0;
-}
-
-#loginJumborton .card {
-  margin-top: 3%;
-  width: 50%;
-  min-width: 300px;
-  border: 0;
-}
-
-#loginButton {
-  margin-top: 20px;
-  box-shadow: -1px 1px 2px 0 #002fff;
-  width: 170px;
-}
+  #loginForm {
+    background: #FFFFFF;
+    padding: 32px;
+    border: 1px solid #E5E5E5;
+    box-shadow: 0 0 1px #E5E5E5;
+  }
 </style>

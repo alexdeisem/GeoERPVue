@@ -1,45 +1,26 @@
+import Axios from 'axios';
 import Vue from 'vue';
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue';
+import Vuelidate from "vuelidate";
+
 import App from './App';
 import router from './router';
 import store from './store';
-import axios from 'axios';
 
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
+import vuetify from './plugins/vuetify';
 
-
+Vue.use(Vuelidate);
 Vue.config.productionTip = false;
+Vue.prototype.$http = Axios;
 
-axios.interceptors.response.use(
-    response => response,
-    error => {
-      if (error.response.status === 422) {
-        store.commit('setErrors', error.response.data.errors);
-      } else if (error.response.status === 401) {
-        store.commit('auth/setUserData', null);
-        localStorage.removeItem('authToken');
-      } else {
-        return Promise.reject(error);
-      }
-    }
-);
+const token = 'Bearer ' + localStorage.getItem('Authorization');
 
-axios.interceptors.request.use(function (config) {
-  config.headers.common = {
-    Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-    "Content-Type": "application/json",
-    Accept: "application/json"
-  };
-
-  return config;
-});
-
-Vue.use(BootstrapVue);
-Vue.use(IconsPlugin);
+if (token) {
+    Vue.prototype.$http.defaults.headers.common['Authorization'] = token;
+}
 
 new Vue({
   router,
   store,
+  vuetify,
   render: h => h(App)
 }).$mount('#app');
