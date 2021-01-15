@@ -14,10 +14,10 @@ export default {
             state.status = 'loading';
         },
 
-        auth_success(state, token, user) {
+        auth_success(state, data) {
             state.status = 'success';
-            state.token = token;
-            state.user = user;
+            state.token = data.token;
+            state.user = data.user;
         },
 
         auth_error(state) {
@@ -27,6 +27,7 @@ export default {
         logout(state) {
             state.status = '';
             state.token = '';
+            state.user = {}
         },
 
         set_user(state, user) {
@@ -56,11 +57,9 @@ export default {
                axios
                    .post(process.env.VUE_APP_API_URL + 'login', user)
                    .then(response => {
-                       const token = response.data.token;
-                       const user = response.data.user;
-                       localStorage.setItem('Authorization', token);
-                       commit('auth_success', token, user);
-                       resolve(response);
+                       localStorage.setItem('Authorization', response.data.token);
+                       commit('auth_success', response.data);
+                       resolve();
                    })
                    .catch(error => {
                        commit('auth_error');

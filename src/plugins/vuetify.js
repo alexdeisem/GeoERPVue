@@ -9,5 +9,13 @@ export default new Vuetify({
     lang: {
         locales: { ru },
         current: 'ru'
+    },
+
+    theme: {
+        themes: {
+            light: {
+                primary: '#264892'
+            }
+        }
     }
 });

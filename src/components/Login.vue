@@ -7,7 +7,10 @@
         lazy-validation
         @submit.prevent="submit"
     >
-      <div class="text-h2 pb-4">GeoERP</div>
+      <div id="Logo" class="text-h2 pb-4">
+        <span>Geo.</span>
+        <span>ERP</span>
+      </div>
       <v-row>
         <v-col cols="12" sm="6" md="6">
           <v-text-field
@@ -37,7 +40,6 @@
           depressed
           color="primary"
           type="submit"
-          @click="submit"
       >
         Войти
       </v-btn>
@@ -74,7 +76,18 @@ export default {
       let password = this.password
       this.$store.dispatch('auth/login', { username, password })
           .then(() => {
-            this.$router.push('/');
+            let user = this.$store.getters['auth/user'];
+
+            if (!user) {
+              return;
+            }
+
+            if (user.isAdmin) {
+              this.$router.push({ name: 'Dashboard' });
+              return
+            }
+
+            this.$router.push({ name: 'EmployeeHome' });
           })
           .catch(err => console.log(err))
     },

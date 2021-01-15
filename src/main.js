@@ -3,8 +3,8 @@ import Vue from 'vue';
 import Vuelidate from "vuelidate";
 
 import App from './App';
-import router from './router';
 import store from './store';
+import router from './router';
 
 import vuetify from './plugins/vuetify';
 

@@ -1,8 +1,6 @@
 <template>
   <v-app>
-    <v-main>
-        <router-view></router-view>
-    </v-main>
+      <router-view></router-view>
   </v-app>
 </template>
 
@@ -41,7 +39,7 @@ export default {
         .then(() => {
           let user = this.$store.getters["auth/user"];
           if (user.isAdmin) {
-            this.$router.push('/admin');
+            this.$router.push({ name: 'Dashboard' });
           }
         })
     }
@@ -53,7 +51,6 @@ export default {
 
     if (!this.$store.getters["auth/isLoggedIn"]) {
       this.$router.push('/login');
-      return;
     }
 
     if (!this.$store.getters['auth/user']) {
@@ -62,10 +59,3 @@ export default {
   },
 };
 </script>
-
-<style>
-  body {
-    font: 1em "Segoe UI", sans-serif;
-  }
-</style>
-
