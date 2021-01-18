@@ -1,6 +1,5 @@
-import Axios from 'axios';
+import axios from 'axios';
 import Vue from 'vue';
-import Vuelidate from "vuelidate";
 
 import App from './App';
 import store from './store';
@@ -8,9 +7,10 @@ import router from './router';
 
 import vuetify from './plugins/vuetify';
 
-Vue.use(Vuelidate);
 Vue.config.productionTip = false;
-Vue.prototype.$http = Axios;
+
+axios.defaults.baseURL = process.env.VUE_APP_API_URL;
+Vue.prototype.$http = axios;
 
 const token = 'Bearer ' + localStorage.getItem('Authorization');
 

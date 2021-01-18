@@ -9,6 +9,12 @@ export default {
         user: null
     },
 
+    getters: {
+        isLoggedIn: state => !!state.token,
+        authStatus: state => state.status,
+        user: state => state.user
+    },
+
     mutations: {
         auth_request(state) {
             state.status = 'loading';
@@ -39,7 +45,7 @@ export default {
         getUser({ commit }) {
             return new Promise((resolve, reject) => {
                 axios
-                    .get(process.env.VUE_APP_API_URL + 'user')
+                    .get('user')
                     .then(response => {
                         commit('set_user', response.data);
                         resolve(response);
@@ -55,9 +61,14 @@ export default {
             return new Promise((resolve, reject) => {
                commit('auth_request');
                axios
-                   .post(process.env.VUE_APP_API_URL + 'login', user)
+                   .post('login', user)
                    .then(response => {
                        localStorage.setItem('Authorization', response.data.token);
+
+                       if (response.data.deleted) {
+                           return;
+                       }
+
                        commit('auth_success', response.data);
                        resolve();
                    })
@@ -77,11 +88,5 @@ export default {
                 resolve();
             })
         }
-    },
-
-    getters: {
-        isLoggedIn: state => !!state.token,
-        authStatus: state => state.status,
-        user: state => state.user
     }
 };

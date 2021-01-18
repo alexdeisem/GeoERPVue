@@ -9,12 +9,6 @@
 export default {
   name: 'App',
 
-  computed : {
-    isLoggedIn: function() {
-      return this.$store.getters["auth/isLoggedIn"];
-    }
-  },
-
   created: function() {
     this.$http.interceptors.response.use(undefined, function (err) {
       return new Promise(function () {
@@ -27,13 +21,6 @@ export default {
   },
 
   methods: {
-    logout: function () {
-      this.$store.dispatch('auth/logout')
-          .then(() => {
-            this.$router.push('/login')
-          })
-    },
-
     getUser: function () {
       this.$store.dispatch("auth/getUser")
         .then(() => {

@@ -17,6 +17,8 @@
               v-for="(item, i) in items"
               :key="i"
               :to="{ name: item.to }"
+              class="font-weight-regular"
+              active-class="font-weight-bold"
           >
             <v-list-item-icon>
               <v-icon v-text="item.icon"></v-icon>

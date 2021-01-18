@@ -1,15 +1,40 @@
-$body-font-family: 'Segoe UI', serif;
-$btn-letter-spacing: 0;
+// ------   GeoPlaneta Theme Variables  ------
 
-// GeoPlaneta theme colors
+// ___   Font   ___
+$gp-font-family: 'Segoe UI', serif;
+$gp-font-weight-normal: 400;
+$gp-letter-spacing: 0;
+$gp-text-transform: none;
+
+$gp-tab-font-size: 16px;
+// _________________
+
+// ___   Colors   ___
+$gp-default-text-color: #333333;
+
 $gp-blue: #264892;
 $gp-red: #c32323;
+$gp-background: #E5E5E5;
+// __________________
 
-$background: #F2F2F2;
+// ------   End GeoPlaneta Theme Variables  ------
 
-* {
-  text-transform: none !important;
+$body-font-family: $gp-font-family;
+
+// Buttons
+$btn-letter-spacing: $gp-letter-spacing;
+$btn-text-transform: $gp-text-transform;
+$btn-font-weight: $gp-font-weight-normal;
+
+// Tabs
+$tab-font-size: $gp-tab-font-size;
+$tabs-item-letter-spacing: $gp-letter-spacing;
+$tab-font-weight: $gp-font-weight-normal;
+
+.v-tab {
+  text-transform: $gp-text-transform;
 }
+// GeoPlaneta theme colors
 
 #Logo {
   :first-child {
@@ -21,7 +46,7 @@ $background: #F2F2F2;
 }
 
 .gp-background {
-  background: $background;
+  background: $gp-background;
 }
 
 .full-height-container {
@@ -31,8 +56,9 @@ $background: #F2F2F2;
 }
 
 .content-container {
-  margin: 20px;
+  margin: 24px 24px 0 24px;
   padding: 0;
+  box-shadow: 0 0 5px 0 #E5E5E5;
 }
 
 .v-btn--active.no-active::before {
