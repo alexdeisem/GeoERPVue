@@ -2,6 +2,7 @@
   <v-data-table
       :headers="headers"
       :items="contracts"
+      :loading="isLoading" loading-text="Получаем данные..."
       dense
   >
     <template v-slot:item.contract_date="{ item }">
@@ -38,22 +39,26 @@ export default {
 
   data() {
     return {
+      isLoading: true,
+
       headers: [
-        { text: 'Номер', value: 'number', sortable: true },
-        { text: 'Дата договора', value: 'contract_date', sortable: true },
-        { text: 'Дата завершения', value: 'end_date', sortable: true },
-        { text: 'Заказчик', value: 'customer.short_name', sortable: true },
+        { text: 'Номер', value: 'number', sortable: true, width: 90 },
+        { text: 'Дата', value: 'contract_date', sortable: true, width: 90 },
+        { text: 'Д. зав.', value: 'end_date', sortable: true, width: 90 },
+        { text: 'Заказчик', value: 'customer.short_name', sortable: true, width: 230 },
         { text: 'Объект', value: 'contract_object', sortable: true },
-        { text: 'Сумма', value: 'sum', sortable: true },
-        { text: 'Бюджет', value: 'budget', sortable: true },
-        { text: 'От кого', value: 'recommend_by', sortable: true },
-        { text: 'Статус', value: 'status', sortable: true },
+        { text: 'Сумма', value: 'sum', sortable: true, width: 110 },
+        { text: 'Бюджет', value: 'budget', sortable: true, width: 110 },
+        { text: 'От кого', value: 'recommend_by', sortable: true, width: 150 },
+        { text: 'Статус', value: 'status', sortable: true, width: 115 },
       ],
     }
   },
 
   mounted() {
-    this.getContracts();
+    this.getContracts().then(() => {
+      this.isLoading = false;
+    });
   },
 
   methods: {

@@ -1,8 +1,9 @@
 <template>
   <v-row
-      class="full-height-container gp-background"
+      class="gp-background"
+      no-gutters
   >
-    <v-col class="content-container white">
+    <v-col class="white">
       <v-col class="teal darken-1 pa-0">
         <v-btn
             v-for="(item, i) in tabItems"
