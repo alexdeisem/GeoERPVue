@@ -16,7 +16,11 @@ export default {
         return '';
       }
 
-      return parseFloat(this.number).toFixed(2);
+      return (+this.number).toLocaleString(
+          'ru-RU', { style: 'currency', currency: 'RUB' }
+          )
+          .replace(',', '.')
+          .slice(0, -2);
     }
   }
 }

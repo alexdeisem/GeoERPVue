@@ -20,7 +20,7 @@ export default {
                     .get('contracts')
                     .then(response => {
                         commit('set_contracts', response.data.contracts);
-                        resolve(response);
+                        resolve(response.data);
                     })
                     .catch((error) => {
                         console.log(error);

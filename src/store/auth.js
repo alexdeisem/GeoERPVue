@@ -6,11 +6,13 @@ export default {
     state: {
         status: '',
         token: localStorage.getItem('Authorization') || '',
-        user: null
+        user: JSON.parse(localStorage.getItem('AuthUser')) || ''
     },
 
     getters: {
-        isLoggedIn: state => !!state.token,
+        isLoggedIn: state => {
+            return !!state.token
+        },
         authStatus: state => state.status,
         user: state => state.user
     },
@@ -48,6 +50,7 @@ export default {
                     .get('user')
                     .then(response => {
                         commit('set_user', response.data);
+                        localStorage.setItem('AuthUser', JSON.stringify(response.data))
                         resolve(response);
                     })
                     .catch((error) => {
@@ -63,18 +66,20 @@ export default {
                axios
                    .post('login', user)
                    .then(response => {
-                       localStorage.setItem('Authorization', response.data.token);
-
-                       if (response.data.deleted) {
+                       if (response.data.user.deleted) {
                            return;
                        }
+
+                       localStorage.setItem('Authorization', response.data.token);
+                       axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.token
+                       localStorage.setItem('AuthUser', JSON.stringify(response.data.user))
 
                        commit('auth_success', response.data);
                        resolve();
                    })
                    .catch(error => {
                        commit('auth_error');
-                       localStorage.removeItem('token');
+                       localStorage.removeItem('Authorization');
                        reject(error);
                    });
             });
