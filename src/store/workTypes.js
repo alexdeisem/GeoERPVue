@@ -4,22 +4,22 @@ export default {
     namespaced: true,
 
     state: {
-        contracts: []
+        workTypes: []
     },
 
     mutations: {
-        set_contracts(state, contracts) {
-            state.contracts = contracts
+        setWorkTypes(state, workTypes) {
+            state.workTypes = workTypes
         }
     },
 
     actions: {
-        getContracts({ commit }, params={}) {
+        getWorkTypes({ commit }, params={}) {
             return new Promise((resolve, reject) => {
                 axios
-                    .get('contracts', {params: params})
+                    .get('work-types', {params: params})
                     .then(response => {
-                        commit('set_contracts', response.data.contracts);
+                        commit('setWorkTypes', response.data);
                         resolve(response.data);
                     })
                     .catch((error) => {
