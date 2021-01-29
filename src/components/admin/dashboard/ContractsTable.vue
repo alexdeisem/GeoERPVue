@@ -1,9 +1,11 @@
 <template>
   <div>
-    <v-row no-gutters>
-      <v-col cols="2" class="pr-8">
+    <v-row 
+      no-gutters
+    >
+       <v-col cols="2" class="pr-8">
         <v-select
-          v-model="activeWorkTypes"
+          :value="activeWorkTypes"
           :items="workTypesItems"
           :menu-props="{ maxHeight: '350' }"
           :label="`Тип работ${activeWorkTypes.length ? '' : ': все'}`"
@@ -11,7 +13,7 @@
           dense
           clearable
           height="29px"
-          @change="updateTableData(true)"
+          @change="handleWorkTypesChange"
         >
           <template v-slot:selection="{ item, index }">
             <v-chip v-if="index === workTypesItems.length - 1" small>
@@ -30,68 +32,115 @@
         </v-select>
       </v-col>
 
+
       <v-col cols="1" class="mr-4">
         <v-text-field
-          v-model="contract_date_start"
           label="Дата договора от"
           mask="date"
           type="date"
-          :value="contract_date_start"
-          @change="updateTableData(true)"
+          :value="contractDateStart"
+          @change="handleContractDateStartChange"
           dense
         ></v-text-field>
       </v-col>
 
       <v-col cols="1" class="mr-8">
         <v-text-field
-          v-model="contract_date_end"
           label="до"
           mask="date"
           type="date"
-          :value="contract_date_end"
-          @change="updateTableData(true)"
+          :value="contractDateEnd"
+          @change="handleContractDateEndChange"
           dense
         ></v-text-field>
       </v-col>
 
       <v-col cols="2">
         <v-text-field
+          :value="searchQuery"
           label="Поиск..."
           type="text"
           dense
           height="29px"
           clearable
           prepend-icon="mdi-magnify"
+          @input="handleSearchQueryChange"
         ></v-text-field>
+      </v-col>
+
+      <v-col class="ml-8">
+        <v-tooltip v-for="(item, i) in checkedStatuses" :key="i" bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              class="mx-1"
+              :outlined="!item.checked"
+              fab
+              x-small
+              :color="item.color"
+              v-bind="attrs"
+              v-on="on"
+              @click="handleStatusSwitcherClick(i)"
+            >
+              <v-icon dark>
+                {{ item.icon }}
+              </v-icon>
+            </v-btn>
+          </template>
+          <span>{{ item.status }}</span>
+        </v-tooltip>
       </v-col>
 
       <v-spacer></v-spacer>
 
-      <v-col cols="4" md="4" xl="2">
+      <v-col cols="1">
+          <v-btn
+            small
+            class="float-right"
+            tile
+            elevation="1"
+            @click="dropFilters"
+          >
+            Сбросить фильтр
+            <v-icon small class="ml-2 pt-1">mdi-backspace-outline</v-icon>
+          </v-btn>
+      </v-col>
+    </v-row>
+
+
+
+    <v-row no-gutters>
+       <v-col cols="2">
+        <p class="body-2">Всего записей: {{ totalContracts }}</p>
+      </v-col>
+
+      <v-spacer></v-spacer>
+
+      <v-col cols="4" md="4" xl="3">
         <v-pagination
           v-if="pageCount > 1"
-          v-model="page"
+          :value="page"
           :length="pageCount"
-          :total-visible="5"
-          @input="updateTableData(false)"
+          :total-visible="8"
+          @input="handelPageChange"
           next-icon="mdi-menu-right"
           prev-icon="mdi-menu-left"
           color="blue"
         ></v-pagination>
       </v-col>
 
-      <v-col>
-         <v-select
-          v-model="pageSize"
+      <v-col xl="1" class="pt-2">
+        <v-select
+          :value="pageSize"
           :items="pageSizes"
           label="Показывать по"
           dense
-          style="width: 100px"
           @change="handlePageSizeChange"
           class="float-right"
         ></v-select>
       </v-col>
     </v-row>
+
+
 
     <v-data-table
       :headers="headers"
@@ -131,15 +180,19 @@
       </template>
     </v-data-table>
 
+
+
+
     <v-row class="pt-8" no-gutters>
       <v-spacer></v-spacer>
-      <v-col cols="6" md="6" xl="3" class="pt-5">
+
+      <v-col cols="6" md="6" xl="3" class="pt-2">
         <v-pagination
           v-if="pageCount > 1"
-          v-model="page"
+          :value="page"
           :length="pageCount"
           :total-visible="8"
-          @input="updateTableData(false)"
+          @input="handelPageChange"
           next-icon="mdi-menu-right"
           prev-icon="mdi-menu-left"
           color="blue"
@@ -147,7 +200,7 @@
       </v-col>
       <v-col cols="6" md="2" xl="1">
         <v-select
-          v-model="pageSize"
+          :value="pageSize"
           :items="pageSizes"
           label="Показывать по"
           @change="handlePageSizeChange"
@@ -173,7 +226,23 @@ export default {
   computed: {
     ...mapState("contracts", ["contracts"]),
     ...mapState("workTypes", ["workTypes"]),
+    ...mapState("contractsTable", ["activeWorkTypes"]),
+    ...mapState("contractsTable", ["checkedStatuses"]),
+    ...mapState("contractsTable", ["contractDateStart"]),
+    ...mapState("contractsTable", ["contractDateEnd"]),
+    ...mapState("contractsTable", ["pageSize"]),
+    ...mapState("contractsTable", ["searchQuery"]),
 
+    page: {
+      get() {
+        return this.$store.state.contractsTable.page;
+      },
+
+      set(page) {
+        this.setPage(page);
+      }
+    },
+    
     workTypesItems() {
       return this.workTypes.map((i) => {
         return { text: i.name, value: i.id };
@@ -185,17 +254,10 @@ export default {
     return {
       isLoading: true,
 
-      page: 1,
       pageCount: 1,
-      pageSize: 10,
       pageSizes: [10, 20, 100, 200, 500],
-
-      contract_date_start: "2007-01-01",
-      contract_date_end: new Date().toISOString().slice(0, 10),
-
       totalContracts: 0,
       options: {},
-      activeWorkTypes: [],
 
       headers: [
         { text: "Номер", value: "number", sortable: true, width: 90 },
@@ -222,28 +284,36 @@ export default {
   },
 
   mounted() {
-    this.getContracts().then((data) => {
-      this.totalContracts = data.count;
-      this.pageCount = Math.round(data.count / data.take);
-      this.isLoading = false;
-    });
-
-    if (this.workTypes.length === 0) {
-      this.getWorkTypes();
-    }
+    this.updateTableData(false);
+    this.getWorkTypes();
   },
 
   methods: {
     ...mapActions("contracts", ["getContracts"]),
     ...mapActions("workTypes", ["getWorkTypes"]),
+    ...mapActions("contractsTable", [
+        "setActiveWorkTypes",
+        "setCheckedStatuses",
+        "setContractDateStart",
+        "setContractDateEnd",
+        "setPage",
+        "setPageSize",
+        "setSearchQuery"
+      ]),
 
     getQueryParams() {
+      let statuses = this.checkedStatuses
+        .filter((i) => i.checked)
+        .map((i) => i.status);
+
       return {
         skip: this.pageSize * (this.page - 1),
         take: this.pageSize,
-        work_types: this.activeWorkTypes.join(),
-        date_start: this.contract_date_start,
-        date_end: this.contract_date_end,
+        work_types: this.activeWorkTypes.map(i => i.value).join(),
+        date_start: this.contractDateStart,
+        date_end: this.contractDateEnd,
+        statuses: statuses.join(","),
+        search: this.searchQuery,
       };
     },
 
@@ -261,12 +331,48 @@ export default {
       });
     },
 
-    handlePageSizeChange() {
+    handleContractDateStartChange(newDate) {
+      this.setContractDateStart(newDate);
+      this.updateTableData(true);
+    },
+
+    handleContractDateEndChange(newDate) {
+      this.setContractDateEnd(newDate);
+      this.updateTableData(true);
+    },
+
+    handelPageChange(page) {
+      this.setPage(page);
+      this.updateTableData(false);
+    },
+
+    handlePageSizeChange(newSize) {
+      this.setPageSize(newSize);
       if (Math.round(this.totalContracts / this.pageSize) < this.page) {
         this.page = Math.round(this.totalContracts / this.pageSize);
       }
 
       this.updateTableData();
+    },
+
+    handleWorkTypesChange(values) {
+      let newActiveItems = [];
+
+      for (let workType of this.workTypes) {
+
+        for (let id of values) {
+          if (id != workType.id) {
+            continue;
+          }
+
+          newActiveItems.push({ text: workType.name, value: workType.id });
+        }
+      } 
+
+      this.activeWorkTypes.splice(0, this.activeWorkTypes.length);
+      this.activeWorkTypes.push(...newActiveItems);
+      this.setActiveWorkTypes(this.activeWorkTypes);
+      this.updateTableData(true);
     },
 
     formatWorkTypeText(text) {
@@ -278,14 +384,50 @@ export default {
         .toUpperCase();
     },
 
-    disableWorkType(item, index) {
+    disableWorkType(item) {
       if (item === "Все типы") {
         this.activeWorkTypes = [];
         return;
       }
 
-      this.activeWorkTypes.splice(index, 1);
+      for (let workType of this.activeWorkTypes) {
+        if (workType.value != item.value) {
+          continue;
+        }
+
+        this.activeWorkTypes.splice(this.activeWorkTypes.indexOf(item), 1);
+        this.setActiveWorkTypes(this.activeWorkTypes);
+      }
+
       this.updateTableData(true);
+    },
+
+    handleStatusSwitcherClick(i) {
+      this.checkedStatuses[i].checked = !this.checkedStatuses[i].checked;
+      this.setCheckedStatuses(this.checkedStatuses);
+      this.updateTableData(true);
+    },
+
+    handleSearchQueryChange(query) {
+      if (query === null) {
+        this.setSearchQuery('');
+        this.updateTableData(true);
+        return;
+      }
+
+      this.setSearchQuery(query);
+      this.updateTableData(true);
+    },
+
+    dropFilters() {
+      this.setSearchQuery('');
+      this.setContractDateStart('2007-01-01');
+      this.setContractDateEnd(new Date().toISOString().slice(0, 10));
+      this.setActiveWorkTypes([]);
+      this.setPage(1);
+      this.setPageSize(10);
+
+      this.updateTableData();
     },
   },
 };

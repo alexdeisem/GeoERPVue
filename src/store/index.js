@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import auth from "@/store/auth";
 import contracts from "@/store/contracts";
+import contractsTable from "@/store/contractsTable";
 import workTypes from "@/store/workTypes";
 
 
@@ -15,6 +16,7 @@ export default new Vuex.Store({
     modules: {
         auth,
         contracts,
+        contractsTable,
         workTypes,
     }
 });

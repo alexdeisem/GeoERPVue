@@ -4,7 +4,7 @@ export default {
     namespaced: true,
 
     state: {
-        workTypes: []
+        workTypes: [],
     },
 
     mutations: {

@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 
 export default {
   name: 'App',
@@ -22,6 +22,8 @@ export default {
   },
 
   computed: {
+    ...mapState("workTypes", ["workTypes"]),
+
     user() {
       return this.$store.getters["auth/user"];
     }
@@ -29,6 +31,7 @@ export default {
 
   methods: {
     ...mapActions('auth', ['getUser', "logout"]),
+    ...mapActions('workTypes', ['getWorkTypes']),
   },
 
   mounted() {
