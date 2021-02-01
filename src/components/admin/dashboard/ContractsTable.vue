@@ -32,7 +32,6 @@
         </v-select>
       </v-col>
 
-
       <v-col cols="1" class="mr-4">
         <v-text-field
           label="Дата договора от"
@@ -144,7 +143,7 @@
 
     <v-data-table
       :headers="headers"
-      :items="contracts"
+      :items="Object.values(contracts)"
       :options.sync="options"
       :page.sync="page"
       :server-items-length="totalContracts"
@@ -177,6 +176,13 @@
       </template>
       <template v-slot:item.budget="{ item }">
         <cell-number v-bind:number="item.budget"></cell-number>
+      </template>
+      <template v-slot:item.status="{ item }">
+        <cell-select
+          v-bind:status="item.status"
+          v-on:status-change="handleThis(item)"
+          v-model="item.status"
+        ></cell-select>
       </template>
     </v-data-table>
 
@@ -214,6 +220,7 @@
 import { mapActions, mapState } from "vuex";
 import CellNumber from "@/components/table/CellNumber";
 import CellDate from "@/components/table/CellDate";
+import CellSelect from "@/components/table/CellSelect";
 
 export default {
   name: "ContractsTable",
@@ -221,6 +228,7 @@ export default {
   components: {
     CellNumber,
     CellDate,
+    CellSelect,
   },
 
   computed: {
@@ -420,15 +428,20 @@ export default {
     },
 
     dropFilters() {
-      this.setSearchQuery('');
-      this.setContractDateStart('2007-01-01');
+      this.setSearchQuery(process.env.VUE_APP_CTBL_SEARCH_QUERY);
+      this.setContractDateStart(process.env.VUE_APP_CTBL_DATE_START);
       this.setContractDateEnd(new Date().toISOString().slice(0, 10));
-      this.setActiveWorkTypes([]);
-      this.setPage(1);
-      this.setPageSize(10);
+      this.setActiveWorkTypes(JSON.parse(process.env.VUE_APP_CTBL_WORK_TYPES));
+      this.setPage(+process.env.VUE_APP_CTBL_PAGE);
+      this.setPageSize(+process.env.VUE_APP_CTBL_PAGE_SIZE);
+      this.setCheckedStatuses(JSON.parse(process.env.VUE_APP_CTBL_STATUSES));
 
       this.updateTableData();
     },
+
+    handleThis(item) {
+      console.log(item);
+    }
   },
 };
 </script>

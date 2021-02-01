@@ -4,12 +4,18 @@ export default {
     namespaced: true,
 
     state: {
-        contracts: []
+        contracts: {}
     },
 
     mutations: {
         set_contracts(state, contracts) {
-            state.contracts = contracts
+            let contractsMap = {};
+
+            for (let contarct of contracts.reverse()) {
+                contractsMap[contarct.id] = contarct;
+            }
+
+            state.contracts = contractsMap;
         }
     },
 

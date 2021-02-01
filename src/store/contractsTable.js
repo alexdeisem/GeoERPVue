@@ -1,46 +1,14 @@
-const CONTRACT_DATE_START = '2007-01-01';
-const CONTRACT_DATE_END = new Date().toISOString().slice(0, 10);
-const PAGE = 1;
-const PAGE_SIZE = 10;
-const SEARCH_QUERY = '';
-const STATUSES =  [
-    {
-      status: "новый",
-      checked: true,
-      icon: "mdi-calendar-plus",
-      color: "blue darker-4",
-    },
-    {
-      status: "в работе",
-      checked: true,
-      icon: "mdi-pickaxe",
-      color: "yellow darken-1",
-    },
-    {
-      status: "выполнен",
-      checked: true,
-      icon: "mdi-check",
-      color: "green accent-4",
-    },
-    {
-      status: "отменен",
-      checked: false,
-      icon: "mdi-close",
-      color: "red darkern-4",
-    },
-];
-
 export default {
     namespaced: true,
 
     state: {
-        activeWorkTypes:   JSON.parse(localStorage.getItem('cTblActiveWorkTypes')) || [],
-        checkedStatuses:   JSON.parse(localStorage.getItem('cTblCheckedStatuses')) || STATUSES,
-        contractDateEnd:   localStorage.getItem('cTblContractDateEnd')             || CONTRACT_DATE_END,
-        contractDateStart: localStorage.getItem('cTblContractDateStart')           || CONTRACT_DATE_START,
-        searchQuery:       localStorage.getItem('cTblSearchQuery')                 || SEARCH_QUERY,
-        page:             +localStorage.getItem('cTblPage')                        || PAGE,
-        pageSize:         +localStorage.getItem('cTblPageSize')                    || PAGE_SIZE,
+        activeWorkTypes:   JSON.parse(localStorage.getItem('cTblActiveWorkTypes')) ||  JSON.parse(process.env.VUE_APP_CTBL_WORK_TYPES),
+        checkedStatuses:   JSON.parse(localStorage.getItem('cTblCheckedStatuses')) ||  JSON.parse(process.env.VUE_APP_CTBL_STATUSES),
+        contractDateEnd:   localStorage.getItem('cTblContractDateEnd')             ||  new Date().toISOString().slice(0, 10),
+        contractDateStart: localStorage.getItem('cTblContractDateStart')           ||  process.env.VUE_APP_CTBL_DATE_START,
+        searchQuery:       localStorage.getItem('cTblSearchQuery')                 ||  process.env.VUE_APP_CTBL_SEARCH_QUERY,
+        page:             +localStorage.getItem('cTblPage')                        || +process.env.VUE_APP_CTBL_PAGE,
+        pageSize:         +localStorage.getItem('cTblPageSize')                    || +process.env.VUE_APP_CTBL_PAGE_SIZE,
     },
 
     mutations: {
